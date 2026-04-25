@@ -8,7 +8,7 @@ const FALLBACK: PortfolioData = {
     description: 'Building products people love. Open to new opportunities.',
     badges: ['React', 'TypeScript', 'Node.js', 'Python', 'Figma'],
     stats: { years: 3, projects: 12, companies: 4 },
-    availableText: 'Available for new projects',
+    availableText: 'Available for new opportunities',
   },
   projects: [],
   experience: [],
@@ -20,7 +20,7 @@ export function usePortfolioData() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/portfolio-data/data.json')
+    fetch(`${import.meta.env.BASE_URL}portfolio-data/data.json`)
       .then(r => { if (!r.ok) throw new Error('No data.json'); return r.json(); })
       .then((d: PortfolioData) => setData(d))
       .catch(() => setData(FALLBACK))
