@@ -1,7 +1,11 @@
 import { Sparkles } from 'lucide-react';
 
-export function Nav() {
+interface Props { name: string; }
+
+export function Nav({ name }: Props) {
+  const initials = name.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   const items = ['Work', 'Skills', 'Experience', 'Contact'];
+
   return (
     <nav
       className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-2 py-2 rounded-full backdrop-blur-xl flex items-center gap-1"
@@ -13,15 +17,12 @@ export function Nav() {
     >
       <div className="flex items-center gap-2 px-4 py-2">
         <Sparkles size={16} style={{ color: '#8B5CF6' }} />
-        <span
-          className="text-white"
-          style={{ fontWeight: 700, letterSpacing: '0.02em' }}
-        >
-          AURORA
+        <span className="text-white" style={{ fontWeight: 700, letterSpacing: '0.02em' }}>
+          {initials}
         </span>
       </div>
       <div className="hidden md:flex items-center gap-1">
-        {items.map((it) => (
+        {items.map(it => (
           <a
             key={it}
             href={`#${it.toLowerCase()}`}
@@ -34,10 +35,7 @@ export function Nav() {
       <a
         href="#contact"
         className="ml-1 px-5 py-2 rounded-full text-white transition hover:shadow-[0_0_30px_rgba(139,92,246,0.6)]"
-        style={{
-          background: 'linear-gradient(90deg, #8B5CF6 0%, #06B6D4 100%)',
-          fontWeight: 600,
-        }}
+        style={{ background: 'linear-gradient(90deg, #8B5CF6 0%, #06B6D4 100%)', fontWeight: 600 }}
       >
         Hire me
       </a>

@@ -1,60 +1,13 @@
 import { useRef, useState, MouseEvent } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import type { PortfolioProject } from '../data/types';
 
-type Project = {
-  title: string;
-  category: string;
-  description: string;
-  stack: string[];
-  image: string;
-  metric: string;
-};
+const PLACEHOLDER_IMG = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800';
 
-const projects: Project[] = [
-  {
-    title: 'Nimbus Analytics',
-    category: 'SaaS · Growth',
-    description:
-      'Self-serve product analytics platform. Led 0→1 launch and scaled MRR from $0 to $480K in 14 months.',
-    stack: ['Product Strategy', 'Mixpanel', 'PLG', 'Figma'],
-    image:
-      'https://images.unsplash.com/photo-1763718528755-4bca23f82ac3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
-    metric: '+312% MRR',
-  },
-  {
-    title: 'Halo Checkout',
-    category: 'Fintech · Payments',
-    description:
-      'Rebuilt checkout flow for LATAM payment gateway. Lifted conversion by 38% across 4 markets.',
-    stack: ['A/B Testing', 'Stripe', 'Amplitude', 'User Research'],
-    image:
-      'https://images.unsplash.com/photo-1686061592689-312bbfb5c055?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
-    metric: '+38% CVR',
-  },
-  {
-    title: 'Orbit CRM',
-    category: 'B2B · Enterprise',
-    description:
-      'Product-led motion for enterprise sales tool. Built activation funnel that tripled trial-to-paid.',
-    stack: ['Roadmapping', 'Segment', 'SQL', 'Notion'],
-    image:
-      'https://images.unsplash.com/photo-1561070791-36c11767b26a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
-    metric: '3x T2P',
-  },
-  {
-    title: 'Pulse Wellness',
-    category: 'Consumer · Mobile',
-    description:
-      'Consumer health app acquired by Series B startup. Launched to 120K users in first quarter.',
-    stack: ['App Store', 'Onboarding', 'Retention', 'Looker'],
-    image:
-      'https://images.unsplash.com/photo-1560461396-ec0ef7bb29dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
-    metric: '120K users',
-  },
-];
+interface Props { projects: PortfolioProject[]; }
 
-function ProjectCard({ p }: { p: Project }) {
+function ProjectCard({ p }: { p: PortfolioProject }) {
   const ref = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [hover, setHover] = useState(false);
@@ -68,15 +21,14 @@ function ProjectCard({ p }: { p: Project }) {
     setTilt({ x: -y * 8, y: x * 8 });
   };
 
+  const summary = [p.problem, p.solution, p.result].filter(Boolean).join(' · ');
+
   return (
     <div
       ref={ref}
       onMouseMove={handleMove}
       onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => {
-        setHover(false);
-        setTilt({ x: 0, y: 0 });
-      }}
+      onMouseLeave={() => { setHover(false); setTilt({ x: 0, y: 0 }); }}
       className="group relative rounded-3xl overflow-hidden cursor-pointer transition-transform duration-300"
       style={{
         transform: `perspective(1200px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${hover ? -8 : 0}px)`,
@@ -89,7 +41,7 @@ function ProjectCard({ p }: { p: Project }) {
     >
       <div className="absolute inset-0 overflow-hidden">
         <ImageWithFallback
-          src={p.image}
+          src={p.image || PLACEHOLDER_IMG}
           alt={p.title}
           className="w-full h-full object-cover transition-all duration-500"
           style={{
@@ -99,14 +51,11 @@ function ProjectCard({ p }: { p: Project }) {
         />
         <div
           className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(15,15,26,0.3) 0%, rgba(15,15,26,0.85) 100%)',
-          }}
+          style={{ background: 'linear-gradient(180deg, rgba(15,15,26,0.3) 0%, rgba(15,15,26,0.85) 100%)' }}
         />
       </div>
 
-      <div className="relative p-7 md:p-8 flex flex-col min-h-[420px]">
+      <div className="relative p-7 md:p-8 flex flex-col min-h-[380px]">
         <div className="flex items-start justify-between gap-4">
           <span
             className="inline-block px-3 py-1.5 rounded-full text-white"
@@ -128,50 +77,56 @@ function ProjectCard({ p }: { p: Project }) {
         </div>
 
         <div className="mt-auto pt-12">
-          <h3
-            className="text-white"
-            style={{ fontSize: '1.75rem', fontWeight: 700, lineHeight: 1.15 }}
-          >
+          <h3 className="text-white" style={{ fontSize: '1.75rem', fontWeight: 700, lineHeight: 1.15 }}>
             {p.title}
           </h3>
           <p className="mt-3 text-white/60" style={{ fontSize: '14px', lineHeight: 1.6 }}>
-            {p.description}
+            {summary}
           </p>
-          <div
-            className="mt-4 inline-block"
-            style={{
-              background: 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              fontWeight: 700,
-              fontSize: '18px',
-            }}
-          >
-            {p.metric}
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {p.stack.map((s) => (
-              <span
-                key={s}
-                className="px-3 py-1 rounded-full text-white/80 backdrop-blur-xl"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  fontSize: '11px',
-                  fontWeight: 500,
-                }}
-              >
-                {s}
-              </span>
-            ))}
-          </div>
+          {p.result && (
+            <div
+              className="mt-4 inline-block"
+              style={{
+                background: 'linear-gradient(90deg, #8B5CF6, #06B6D4)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 700,
+                fontSize: '18px',
+              }}
+            >
+              {p.result}
+            </div>
+          )}
+          {p.tags.length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {p.tags.map(t => (
+                <span
+                  key={t}
+                  className="px-3 py-1 rounded-full text-white/80 backdrop-blur-xl"
+                  style={{
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    fontSize: '11px',
+                    fontWeight: 500,
+                  }}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-export function Projects() {
+export function Projects({ projects }: Props) {
+  if (projects.length === 0) return null;
+
+  const left = projects.filter((_, i) => i % 2 === 0);
+  const right = projects.filter((_, i) => i % 2 === 1);
+
   return (
     <section id="work" className="relative px-6 md:px-16 py-24">
       <div className="max-w-7xl mx-auto">
@@ -184,30 +139,20 @@ export function Projects() {
               className="text-white"
               style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1 }}
             >
-              Products I've shipped.
+              Projects I've shipped.
             </h2>
           </div>
           <p className="text-white/60 max-w-md" style={{ fontSize: '1rem', lineHeight: 1.6 }}>
-            A handful of bets I've led end-to-end — from scrappy MVPs to enterprise-scale platforms.
+            Work that went from idea to production.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-6">
-            <div style={{ height: '520px' }}>
-              <ProjectCard p={projects[0]} />
-            </div>
-            <div style={{ height: '460px' }}>
-              <ProjectCard p={projects[2]} />
-            </div>
+            {left.map(p => <ProjectCard key={p.title} p={p} />)}
           </div>
           <div className="flex flex-col gap-6 md:mt-16">
-            <div style={{ height: '460px' }}>
-              <ProjectCard p={projects[1]} />
-            </div>
-            <div style={{ height: '520px' }}>
-              <ProjectCard p={projects[3]} />
-            </div>
+            {right.map(p => <ProjectCard key={p.title} p={p} />)}
           </div>
         </div>
       </div>
